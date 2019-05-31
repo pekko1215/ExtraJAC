@@ -1,0 +1,37 @@
+var control = {
+	reel:{
+		speed:37,
+		slipspeed:37,
+		margin:0
+	},
+	minbet:1,
+	wait:0,
+	code:[
+		"はずれ",
+		"リプレイ",
+		"ベル",
+		"チェリー",
+		"スイカ",
+		"JAC1",
+		"JAC2",
+		"JAC2-2",
+		"JAC3",
+		"JAC3-2",
+        "JAC3-3",
+        "JAC4",
+		"JACGAME1",
+		"JACGAME2",
+		"SBIG",
+		"SBIG-2",
+		"SBIG-3",
+		"NBIG",
+		"NBIG-2",
+		"NBIG-3",
+		"REG",
+		"REG小役",
+		"REGリプレイ",
+		"確定チェリー",
+		"1枚がけSBIG"
+		],
+	maxpay:[15,15,15]
+}
