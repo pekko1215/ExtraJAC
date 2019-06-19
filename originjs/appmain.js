@@ -13,7 +13,7 @@ function main() {
     var lastPay = 0;
     var renCount = 0;
     var lastBonusCount = 0;
-    const NBIG_PAY = 200;
+    const NBIG_PAY = 460;
     slotmodule.on("allreelstop", async function (e) {
         if (e.hits != 0) {
             if (e.hityaku.length == 0) return
@@ -398,13 +398,13 @@ function main() {
                         break
                     case 'JAC1':
                         bonusFlag = 'JAC1';
-                        ret = 'プラム'
+                        ret = 'ベル'
                         break
                     default:
                         if (bonusFlag == 'JAC3') {
                             ret = 'JAC3'
                         } else {
-                            ret = 'プラム'
+                            ret = 'ベル'
                         }
                 }
                 break
@@ -454,13 +454,19 @@ function main() {
                                 break
                         }
                         break
+                    case 'JAC1':
+                        bonusFlag = 'JAC1';
+                        ret = 'スイカ'
+                        break
                     case 'JAC4':
                         bonusFlag = 'JAC4';
                         ret = 'JAC4'
+                        if(!rand(8)) ret = 'スイカ'
                         break
                     default:
                         ret = bonusFlag
                 }
+                console.log({lot,bonusFlag,ret});
                 break
             case 'SBIG':
                 ret = 'JACGAME1'
@@ -665,11 +671,16 @@ function main() {
         SaveData();
         changeCredit(0)
     }
+
+    var oldGameMode = null;
+
     function setGamemode(mode) {
+        oldGameMode = gameMode;
         // console.log(`${gameMode} -> ${mode}`)
         switch (mode) {
             case 'normal':
-                gameMode = 'normal'
+                gameMode = 'normal';
+                if(bonusFlag && bonusFlag.includes('JAC')) bonusFlag = null;
                 slotmodule.setLotMode(0)
                 slotmodule.setMaxbet(3);
                 break
@@ -887,71 +898,76 @@ function main() {
         }
     }
 
+
+    async function TypeWra(text,timing = 0){
+        return new Promise(r=>{
+            var f = (cb)=>{
+                slotmodule.freeze();
+                Typewriter(text,{
+                    speed:150,
+                    delay:5000,
+                }).change((t)=>{
+                    t!="\n"&&sounder.playSound('type');
+                }).title(()=>{
+                    sounder.playSound('title');
+                }).finish((e)=>{
+                    e.parentNode.removeChild(e);
+                    setTimeout(()=>{
+                        slotmodule.resume();
+                        r();
+                    },1000)
+                });
+            }
+            if(timing == 0) return f();
+            var f2 = ()=>{
+                slotmodule.once('reelstop',()=>{
+                    timing--;
+                    if(timing == 0) return f();
+                    f2();
+                })
+            }
+            f2();
+        })
+        
+        
+    }
+
     var voltageIndex;
     var isEffected = false;
     var isGekiLamp;
     async function effect(lot) {
         switch (gameMode) {
             case 'normal':
-                switch (slotmodule.playControlData.betcoin) {
-                    case 3:
-                        if (!isEffected) {
-                            await leverChance(bonusFlag == 'BIG1');
-                        }
-                        break
-                    case 2:
-                        var voltageMode = bonusFlag == 'BIG1' ? 'high' : 'low';
-                        var next;
-                        if (lot == 'リプレイ') {
-                            next = ArrayLot(VoltageMap.CZ[voltageMode][voltageIndex]);
-                        } else {
-                            next = voltageIndex;
-                            for (var i = 0; i < 3; i++) {
-                                next = ArrayLot(VoltageMap.CZ[voltageMode][next]);
+            break
+            case 'NBIG':
+                if(oldGameMode == 'JAC2'){
+                    if(lot == 'JAC4'){
+                        if(rand(8)){
+                            await TypeWra('スイカを盗め！',!rand(6) ? 1 : 0);
+                            if(!rand(8)){
+                                await TypeWra('俺の名は<br>イケゾリ三世')
                             }
                         }
-                        slotmodule.once('bet', async () => {
-                            slotmodule.freeze();
-                            await upVoltage(voltageIndex, next);
-                            voltageIndex = next;
-                            if (lot == 'リプレイ') {
-                                return slotmodule.resume();
+                    }else{
+                        if(lot == 'スイカ'){
+                            if(rand(4)){
+                                TypeWra('スイカを盗め！',!rand(32) ? 1 : 0)
                             }
-                            sounder.stopSound('bgm')
-                            return slotmodule.resume();
-                        })
-                        break
+                        }
+                    }
+                }else{
+
                 }
-                break
-            case 'REG1':
-                voltageIndex = 0;
-                voltageReset();
-                break
-            case 'BIG2':
-                voltageReset();
-                var vol = ArrayLot(VoltageMap.normal[lot]);
-                if (!vol) break;
-                upVoltage(0, vol);
-                var gekiList = { 'JACIN': [1, 99], 'REG1': [2, 99], 'REG2': [50, 50] }[lot];
-                if (!gekiList) break;
-                if (ArrayLot(gekiList)) return
-                sounder.playSound('geki');
-                $('#geki').addClass('show');
-                break
-            case 'BIG1':
-                if (!bonusFlag || isGekiLamp) return;
-                var gekiFlag = !rand({
-                    true: 16,
-                    false: 200
-                }[bonusFlag == 'REG2']);
-                if (!gekiFlag) return;
-                isGekiLamp = true;
-                sounder.playSound('geki');
-                $('#geki').addClass('show');
-                break
-            case 'JAC':
-                isEffected = false;
-                $('#geki').removeClass('show');
+            break
+            case 'SBIG':
+            break
+            case 'JAC1':
+            break
+            case 'JAC2':
+            break
+            case 'JAC3':
+            break
+            case 'JAC4':
         }
     }
     $(window).bind("unload", function () {

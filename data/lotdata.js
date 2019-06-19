@@ -5,32 +5,35 @@
 var lotdata = {
     normal: [{
         name:'NBIG',
-        value:1/30
+        value:1/15
     },{
         name:'SBIG',
-        value:1/99
+        value:1/40
     },{
         name:'REG',
-        value:1/42
+        value:1/20
     },{
         name:"リプレイ",
         value:1/9
     },{
         name:"ベル",
-        value:1/21.3
+        value:1/6
     },{
         name:"チェリー",
         value:1/49
     },{
         name:'スイカ',
-        value:1/8
+        value:1/64
     }],
     NBIG:[{
             name:'REG',
             value:1/64
         },{
             name:"JAC4",
-            value:1
+            value:1/2
+        },{
+            name:'JAC1',
+            value:1/2
         }],
     SBIG:[{
             name:"JACGAME3",
@@ -39,7 +42,7 @@ var lotdata = {
 
     JAC1:[{
         name:"リプレイ",
-        value:1/7.7
+        value:1/6
     },{
         name:"ベル",
         value:1/7.3
@@ -66,7 +69,7 @@ var lotdata = {
 
     },{
         name:'JAC1',
-        value:1/2.4
+        value:1/5
     }],
 
     JAC3:[{

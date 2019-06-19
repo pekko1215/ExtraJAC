@@ -113,7 +113,8 @@ var YakuData = [
     },
     {
         name: "JACGAME",
-        pay: [0, 0, 12]
+        pay: [0, 0, 12],
+        flashLine:dummnyLines["右下がり"]
     },
     {
         name: "リプレイ",
