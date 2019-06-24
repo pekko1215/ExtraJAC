@@ -30,10 +30,7 @@ var lotdata = {
             value:1/64
         },{
             name:"JAC4",
-            value:1/2
-        },{
-            name:'JAC1',
-            value:1/2
+            value:1/1
         }],
     SBIG:[{
             name:"JACGAME3",
@@ -69,7 +66,7 @@ var lotdata = {
 
     },{
         name:'JAC1',
-        value:1/5
+        value:1/4
     }],
 
     JAC3:[{
@@ -79,7 +76,7 @@ var lotdata = {
 
     JAC4:[{
         name:'JAC1',
-        value:1/76
+        value:1/40
     },{
         name:'JAC4',
         value:1/32

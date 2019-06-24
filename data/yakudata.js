@@ -46,11 +46,12 @@ var YakuData = [
     },
     {
         name: "ベル",
-        pay: [6, 0, 0],
+        pay: [9, 9, 0],
     },
     {
         name: "チェリー",
-        pay: [4,4 ,4 ],
+        pay: [8 ,8 ,8 ],
+        flashLine:dummnyLines["なし"]
     },
     {
         name: "スイカ",
@@ -123,6 +124,11 @@ var YakuData = [
     },
     {
         name: "リプレイ",
+        pay: [0, 0, 0],
+        flashLine:dummnyLines["なし"]
+    },
+    {
+        name: "JAC4",
         pay: [0, 0, 0],
         flashLine:dummnyLines["なし"]
     },

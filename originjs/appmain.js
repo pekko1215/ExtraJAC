@@ -38,6 +38,7 @@ function main() {
         for (var i = 0; i < e.hityaku.length; i++) {
             var d = e.hityaku[i];
             // var matrix = d.matrix;
+            console.log(d);
             switch (gameMode) {
                 case 'normal':
                     switch (d.name) {
@@ -68,6 +69,7 @@ function main() {
                             isEffected = false;
                             $('#disk').removeClass('show');
                             voltageReset();
+                            playcount = 0;
                             break
                         case "NBIG":
                             setGamemode('NBIG');
@@ -77,6 +79,7 @@ function main() {
                             isEffected = false;
                             $('#disk').removeClass('show');
                             voltageReset();
+                            playcount = 0;
                             break
                         case 'REG': //CZに移行
                             setGamemode('REG');
@@ -85,6 +88,7 @@ function main() {
                             isEffected = false;
                             $('#disk').removeClass('show');
                             voltageReset();
+                            playcount = 0;
                     }
                     break;
                 case 'SBIG':
@@ -102,6 +106,7 @@ function main() {
                             setGamemode('REG');
                             bonusData.jacIn('REG', 8, 8);
                             bonusFlag = null;
+                            playcount = 0;
                             break
                         case 'JAC1':
                             setGamemode('JAC1');
@@ -112,11 +117,13 @@ function main() {
                             setGamemode('JAC2');
                             bonusData.jacIn('JAC2', 3, 3);
                             bonusFlag = null;
+                            playcount = 0;
                             break
                         case 'JAC3':
                             setGamemode('JAC3');
                             bonusData.jacIn('JAC3', 8, 8);
                             bonusFlag = null;
+                            playcount = 0;
                             break
                         case 'JAC4':
                             setGamemode('JAC4');
@@ -149,7 +156,7 @@ function main() {
             bonusData.onNextGame(e.pay)
             // console.log(bonusData,e.pay,bonusData.getGameMode())
             setGamemode(bonusData.getGameMode());
-            if (bonusData.isEnd == true && bonusData.name == 'BIG1') {
+            if (bonusData.isEnd == true) {
                 sounder.stopSound("bgm");
                 bonusData = null;
             }
@@ -456,7 +463,11 @@ function main() {
                         break
                     case 'JAC1':
                         bonusFlag = 'JAC1';
-                        ret = 'スイカ'
+                        if(!rand(4)){
+                            ret = 'スイカ'
+                        }else{
+                            ret = 'ベル'
+                        }
                         break
                     case 'JAC4':
                         bonusFlag = 'JAC4';
@@ -676,7 +687,7 @@ function main() {
 
     function setGamemode(mode) {
         oldGameMode = gameMode;
-        // console.log(`${gameMode} -> ${mode}`)
+        console.log(`${gameMode} -> ${mode}`)
         switch (mode) {
             case 'normal':
                 gameMode = 'normal';
@@ -691,7 +702,7 @@ function main() {
                 break
             case 'NBIG':
                 gameMode = 'NBIG';
-                slotmodule.setLotMode(0)
+                slotmodule.setLotMode(1)
                 slotmodule.setMaxbet(3);
                 break
             case 'REG':
@@ -711,7 +722,7 @@ function main() {
                 break
             case 'JAC3':
                 gameMode = 'JAC3';
-                slotmodule.setLotMode(0)
+                slotmodule.setLotMode(1)
                 slotmodule.setMaxbet(3);
                 break
             case 'JAC4':
@@ -940,10 +951,11 @@ function main() {
             case 'normal':
             break
             case 'NBIG':
-                if(oldGameMode == 'JAC2'){
+                if(oldGameMode != 'JAC4'){
                     if(lot == 'JAC4'){
                         if(rand(8)){
-                            await TypeWra('スイカを盗め！',!rand(6) ? 1 : 0);
+                            let type = !rand(4) == 0 ? 'スイカを盗め！' : 'プラムを盗め！';
+                            await TypeWra(type,!rand(6) ? 1 : 0);
                             if(!rand(8)){
                                 await TypeWra('俺の名は<br>イケゾリ三世')
                             }
@@ -952,6 +964,11 @@ function main() {
                         if(lot == 'スイカ'){
                             if(rand(4)){
                                 TypeWra('スイカを盗め！',!rand(32) ? 1 : 0)
+                            }
+                        }
+                        if(lot == 'ベル'){
+                            if(rand(4)){
+                                TypeWra('プラムを盗め！',!rand(32) ? 1 : 0)
                             }
                         }
                     }
