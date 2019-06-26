@@ -46,7 +46,7 @@ var YakuData = [
     },
     {
         name: "ベル",
-        pay: [9, 9, 0],
+        pay: [5, 12, 0],
     },
     {
         name: "チェリー",
@@ -109,7 +109,7 @@ var YakuData = [
     },
     {
         name: "JACGAME",
-        pay: [0, 0, 15],
+        pay: [0, 0, 3],
         flashLine:dummnyLines["中段"]
     },
     {
