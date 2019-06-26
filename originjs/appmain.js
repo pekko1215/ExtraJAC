@@ -160,11 +160,12 @@ function main() {
                 sounder.stopSound("bgm");
                 bonusData = null;
             }
-            changeBonusSeg();
         }
+        changeBonusSeg();
     })
     slotmodule.on("leveron", function () { })
     slotmodule.on("bet", function (e) {
+        changeBonusSeg();
         sounder.playSound("3bet")
         if ("coin" in e) {
             (function (e) {
@@ -182,10 +183,9 @@ function main() {
                 }
             })(e)
         }
-        if (gameMode == "jac") {
-            segments.payseg.setSegments(bonusData.jacgamecount)
-        } else {
-            segments.payseg.reset();
+        segments.payseg.reset();
+        if (gameMode.includes('JAC')) {
+            changeBonusSeg();
         }
     })
     slotmodule.on("pay", async (e) => {
@@ -321,7 +321,7 @@ function main() {
                         }
                         break;
                     default:
-                        ret = "はずれ"
+                        ret = "JAC1"
                         if (bonusFlag) {
                             ret = bonusFlag;
                         }
@@ -592,7 +592,7 @@ function main() {
     window.gameMode = "NBIG";
     var bonusFlag = 'JAC1'
     var coin = 0;
-    window.bonusData = new BonusData.BigBonus5("NBIG", NBIG_PAY);
+    window.bonusData = new BonusData.BigBonus5("NBIG", rand(NBIG_PAY)+1);
     var replayFlag;
     var isCT = false;
     var CTBIG = false;
@@ -759,10 +759,16 @@ function main() {
     }
 
     function changeBonusSeg() {
-        if (!this.bonusData) return segments.effectseg.setSegments("");
-        if (this.bonusData instanceof BonusData.RegularBonus5) return;
-        segments.effectseg.setSegments(bonusData.getBonusSeg());
-        if (bonusData.isJacin && bonusData.jacName == 'JAC') {
+        if (!this.bonusData||gameMode == 'NBIG'||gameMode.includes('JAC')){
+            segments.effectseg.setSegments("");
+        }else{
+            segments.effectseg.setSegments(bonusData.getBonusSeg());
+        }
+        // if (this.bonusData instanceof BonusData.RegularBonus5) return;
+        if (gameMode.includes('JAC')) {
+            if(gameMode == 'JAC1' && bonusData.payCount > 3){
+                return;
+            }
             segments.payseg.setSegments("" + bonusData.payCount)
         }
     }
