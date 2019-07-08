@@ -1,161 +1,145 @@
 /**
  * Created by yuto-note on 2017/07/21.
  */
-function Sounder(filesObj) {
-    this.soundFilesObj = {
-        unload: [],
-        loaded: []
-    };
-    this.firstLoad = false;
-    this.sources = [];
-    this.loops = [];
-    this.nodeGains = {};
-    this.volumedata = {};
 
-    var AudioContext = window.AudioContext // Default
-        ||
-        window.webkitAudioContext // Safari and old versions of Chrome
-        ||
-        false;
-    this.context = new AudioContext();
-}
-Sounder.prototype.addFile = function(file, tag) {
-    var that = this
-    this.soundFilesObj.unload.push({
-        filename: file,
-        tag: [tag],
-        addTag: function(tag) {
-            this.tag.push(tag);
-            return this;
-        },
-        setVolume: function(volume) {
-            that.setVolume(this.tag[0], volume);
-        }
-    });
-    return this.soundFilesObj.unload[this.soundFilesObj.unload.length - 1];
-}
-
-Sounder.prototype.setVolume = function(tag, volume) {
-    var that = this;
-    that.volumedata[tag] = volume;
-}
-
-Sounder.prototype.loadFile = function(callback) {
-
-    this.compressor = this.context.createDynamicsCompressor();
-
-    this.compressor.threshold.value = -50;
-    this.compressor.knee.value = 40;
-    this.compressor.ratio.value = 12;
-    this.compressor.reduction.value = -20;
-    this.compressor.attack.value = 0;
-    this.compressor.release.value = 0.25;
-
-    var context = this.context;
-    var soundFilesObj = this.soundFilesObj;
-    var that = this;
-    Promise.all(soundFilesObj.unload.map(function(file) {
-        return new Promise(function(fulfilled, rejected) {
-            var request = new XMLHttpRequest();
-            request.open("GET", file.filename, true);
+class SoundData {
+    constructor(filename, tags = []) {
+        this.loaded = false;
+        this.tags = tags;
+        this.filename = filename;
+        this.volume = 1;
+    }
+    addTag(tag) {
+        this.tags.push(tag);
+        return this;
+    }
+    setVolume(volume) {
+        this.volume = volume;
+        if (this.gain) this.gain.gain.value = volume;
+        return this;
+    }
+    async loadFile(context, masterGain) {
+        if (this.loaded) return;
+        return new Promise((r, e) => {
+            let request = new XMLHttpRequest();
+            request.open("GET", this.filename, true);
             request.responseType = "arraybuffer";
 
-            request.onload = function() {
-                context.decodeAudioData(request.response, function(buffer) {
-                    soundFilesObj.loaded.push({
-                        filename: file.filename,
-                        buffer: buffer,
-                        tag: file.tag
-                    });
-                    fulfilled();
-                }, function(e) {
-                    console.log(e);
+            request.onload = () => {
+                context.decodeAudioData(request.response, (buffer) => {
+                    this.gain = context.createGain();
+                    this.gain.gain.value = this.volume;
+                    this.gain.connect(masterGain);
+                    this.buffer = buffer;
+                    r();
+                }, (error) => {
+                    console.error(error);
+                    e();
                 })
             }
             request.send();
         })
-    })).then(function() {
-        that.firstLoad = true;
-        soundFilesObj.unload = [];
-        callback && callback();
-    })
-}
-
-Sounder.prototype.playSound = function(tag, loop, callback = () => {}, loopstart, loopend) {
-    return new Promise(r => {
-        if (!this.firstLoad) {
-            console.log("loadFile ga zikkou sarete naiyo")
-        }
-        var arr = this.soundFilesObj.loaded.filter(function(f) {
-            return f.tag.indexOf(tag) != -1;
-        })
-        if (arr.length == 0) {
-            return false;
-        }
-        var that = this;
-        arr.forEach(function(f) {
-            var source = that.context.createBufferSource();
-            source.buffer = f.buffer;
-            source.loop = loop;
-            if (loop) {
-                source.loopStart = loopstart || 0;
-                source.loopEnd = loopend || f.buffer.duration;
-                that.loops.push({ tag: f.tag, source: source })
-            } else {
-                setTimeout(() => {
-                    r();
-                    callback && callback();
-                    callback = null;
-                }, f.buffer.duration * 1000);
-            }
-            var volume = 1;
-            var base = source;
-            if (!that.nodeGains[f.tag[0]]) {
-                that.nodeGains[f.tag[0]] = that.context.createGain()
-            }
-            f.tag.forEach(function(tag) {
-                if (that.volumedata[tag] === undefined) {
-                    that.volumedata[tag] = 1;
-                }
-                volume *= that.volumedata[tag];
-            })
-            // console.log(volume)
-            that.nodeGains[f.tag[0]].gain.value = volume;
-            // console.log(that.nodeGains);
-            base.connect(that.nodeGains[f.tag[0]]);
-            that.nodeGains[f.tag[0]].connect(that.compressor);
-
-            that.compressor.connect(that.context.destination);
-            source.start()
-        });
-    })
-}
-
-
-
-Sounder.prototype.stopSound = function(tag) {
-
-    var choiceArray = [];
-    this.loops.forEach(function(f, i) {
-        if (f.tag.indexOf(tag) != -1) {
-            choiceArray.push(i)
-        }
-    })
-    if (choiceArray.length == 0) {
-        return false;
     }
-    var that = this;
-    choiceArray.forEach(function(f) {
-        try {
-            that.loops[f].source.stop();
-        } catch (e) {
-            return false;
-        }
-    })
+}
 
-    this.loops = this.loops.filter(function(f, i) {
-        return choiceArray.indexOf(i) == -1
-    });
+class Sounder {
+    constructor() {
+        this.soundDatas = [];
+        this.context = null;
+        this.playingBuffers = [];
+        this.loaderElements = {};
+        this.loaded = false;
+        this.masterVolume = 1;
+        let $cover = document.createElement('div');
+        $cover.style.textAlign = 'center';
+        $cover.style.position = 'fixed';
+        $cover.style.width = '100%';
+        $cover.style.height = '100%';
+        $cover.style.left = 0;
+        $cover.style.top = 0;
+        $cover.style.backgroundColor = 'black';
+        $cover.style.color = 'white';
+        let $h1 = document.createElement('h1');
+        $cover.addEventListener('click', () => this.startLoad());
+        $h1.innerText = 'クリックしてロード開始';
+        document.body.appendChild($cover);
+        $cover.appendChild($h1);
+        this.loaderElements = { $h1, $cover };
+    }
 
-    return true;
+    async startLoad() {
+        if (this.loaded) return;
+        this.context = new AudioContext();
+        this.masterGain = this.context.createGain();
+        this.masterGain.gain.value = this.masterVolume;
+        this.masterGain.connect(this.context.destination);
+        this.loaderElements.$h1.parentNode.removeChild(this.loaderElements.$h1);
+        await Promise.all(this.soundDatas.map(async data => {
+            data.loadFile(this.context, this.masterGain)
+        }));
+
+        this.loaderElements.$cover.parentNode.removeChild(this.loaderElements.$cover);
+        this.loaded = true;
+    }
+
+    addFile(file, tag) {
+        let obj = new SoundData(file, [tag])
+        this.soundDatas.push(obj);
+        return obj;
+    }
+
+    setVolume(tag, value) {
+        this.soundDatas.forEach(data => {
+            if (data.tags.includes(tag)) {
+                data.setVolume(value);
+            }
+        })
+    }
+
+    setMasterVolume(value) {
+        this.masterVolume = value;
+        if (this.masterGain) this.masterGain.gain.value = value;
+    }
+
+    getSoundDatasByTag(tag, isLoaded = false) {
+        return this.soundDatas.filter(data => {
+            return data.tags.includes(tag) && (isLoaded ? data.loaded : true)
+        });
+    }
+
+    playSound(tag, isLoop, callback = () => {}, loopStart = 0, loopEnd) {
+        if (!this.loaded) return;
+        let playingData = {
+            sources: [],
+            soundDatas: []
+        };
+        return new Promise(r => {
+            let arr = this.getSoundDatasByTag(tag);
+            playingData.soundDatas = arr;
+            if (arr.length == 0) return false;
+            for (let data of arr) {
+                let source = this.context.createBufferSource();
+                source.buffer = data.buffer;
+                source.loop = isLoop;
+                if (isLoop) {
+                    source.loopStart = loopStart;
+                    source.loopEnd = loopEnd || data.buffer.duration;
+                }
+                source.onended = r;
+                source.connect(data.gain);
+                playingData.sources.push(source);
+                source.start();
+            }
+            this.playingBuffers.push(playingData);
+        }).then(r => {
+            playingData.sources.forEach(source => source.stop());
+            this.playingBuffers = this.playingBuffers.filter(data => data !== playingData);
+            callback();
+        })
+    }
+
+    stopSound(tag) {
+        let arr = this.playingBuffers.filter(data => data.soundDatas.find(sd => sd.tags.includes(tag)));
+        arr.forEach(({ sources }) => sources.forEach(source => source.stop()));
+    }
 }

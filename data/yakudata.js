@@ -3,40 +3,39 @@
  */
 
 var dummnyLines = {
-    "中段":[
-        [0,0,0],
-        [1,1,1],
-        [0,0,0]
+    "中段": [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0]
     ],
-    "上段":[
-        [1,1,1],
-        [0,0,0],
-        [0,0,0]
+    "上段": [
+        [1, 1, 1],
+        [0, 0, 0],
+        [0, 0, 0]
     ],
-    "下段":[
-        [0,0,0],
-        [0,0,0],
-        [1,1,1]
+    "下段": [
+        [0, 0, 0],
+        [0, 0, 0],
+        [1, 1, 1]
     ],
-    "右下がり":[
-        [1,0,0],
-        [0,1,0],
-        [0,0,1]
+    "右下がり": [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
     ],
-    "右上がり":[
-        [0,0,1],
-        [0,1,0],
-        [1,0,0]
+    "右上がり": [
+        [0, 0, 1],
+        [0, 1, 0],
+        [1, 0, 0]
     ],
-    "なし":[
-        [0,0,0],
-        [0,0,0],
-        [0,0,0]
+    "なし": [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
     ]
 }
 
-var YakuData = [
-    {
+var YakuData = [{
         name: "はずれ",
         pay: [0, 0, 0]
     },
@@ -46,38 +45,38 @@ var YakuData = [
     },
     {
         name: "ベル",
-        pay: [9, 9, 0],
+        pay: [5, 5, 0],
     },
     {
         name: "チェリー",
-        pay: [8 ,8 ,8 ],
-        flashLine:dummnyLines["なし"]
+        pay: [8, 8, 8],
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "スイカ",
-        pay: [15, 15, 15],
+        pay: [15, 15, 1],
     },
     {
         name: "JAC1",
         pay: [0, 0, 0],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "JAC4",
         pay: [0, 0, 0],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "1枚役2",
         pay: [1, 1, 1],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "SBIG",
         pay: [0, 0, 0]
     },
     {
-        name: "NBIG",
+        name: "REG",
         pay: [0, 0, 0]
     },
     {
@@ -89,48 +88,48 @@ var YakuData = [
         pay: [0, 0, 0]
     },
     {
-        name: "REG",
+        name: "NBIG",
         pay: [0, 0, 0],
     },
     {
         name: "1枚役1",
         pay: [1, 1, 1],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "JACGAME",
-        pay: [0, 0, 15],
-        flashLine:dummnyLines["右上がり"]
+        pay: [0, 0, 11],
+        flashLine: dummnyLines["右上がり"]
     },
     {
         name: "JACGAME",
-        pay: [0, 0, 15],
-        flashLine:dummnyLines["右上がり"]
+        pay: [0, 0, 11],
+        flashLine: dummnyLines["右上がり"]
     },
     {
         name: "JACGAME",
-        pay: [0, 0, 15],
-        flashLine:dummnyLines["中段"]
+        pay: [0, 0, 3],
+        flashLine: dummnyLines["中段"]
     },
     {
         name: "JACGAME",
         pay: [0, 0, 12],
-        flashLine:dummnyLines["右下がり"]
+        flashLine: dummnyLines["右下がり"]
     },
     {
         name: "リプレイ",
         pay: [0, 0, 0],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "リプレイ",
         pay: [0, 0, 0],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
     {
         name: "JAC4",
         pay: [0, 0, 0],
-        flashLine:dummnyLines["なし"]
+        flashLine: dummnyLines["なし"]
     },
 
 ]

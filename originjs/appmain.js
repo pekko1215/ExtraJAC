@@ -6,38 +6,37 @@ controlRerquest("data/control.smr", main)
 
 function main() {
     window.scrollTo(0, 0);
-    var sbig;
-    var notplaypaysound = false;
-    var hyperzone = 0;
-    var hypergame = 0;
-    var lastPay = 0;
-    var renCount = 0;
-    var lastBonusCount = 0;
+    let sbig;
+    let notplaypaysound = false;
+    let hyperzone = 0;
+    let hypergame = 0;
+    let lastPay = 0;
+    let renCount = 0;
+    let lastBonusCount = 0;
     const NBIG_PAY = 460;
-    slotmodule.on("allreelstop", async function (e) {
+    slotmodule.on("allreelstop", async function(e) {
         if (e.hits != 0) {
             if (e.hityaku.length == 0) return
-            var matrix = e.hityaku[0].flashLine || e.hityaku[0].matrix;
-            var count = 0;
-            var { name } = e.hityaku[0];
-            slotmodule.once("bet", function () {
+            let matrix = e.hityaku[0].flashLine || e.hityaku[0].matrix;
+            let count = 0;
+            let { name } = e.hityaku[0];
+            slotmodule.once("bet", function() {
                 slotmodule.clearFlashReservation()
             })
             notplaypaysound = false;
             switch (name) {
-                default:
-                    slotmodule.setFlash(null, 0, function (e) {
-                        slotmodule.setFlash(flashdata.default, 20)
-                        slotmodule.setFlash(replaceMatrix(flashdata.default, matrix, colordata.LINE_F, null), 20, arguments.callee)
-                    })
+                default: slotmodule.setFlash(null, 0, function(e) {
+                    slotmodule.setFlash(flashdata.default, 20)
+                    slotmodule.setFlash(replaceMatrix(flashdata.default, matrix, colordata.LINE_F, null), 20, arguments.callee)
+                })
             }
         }
         replayFlag = false;
-        var nexter = true;
-        var changeBonusFlag = false;
-        for (var i = 0; i < e.hityaku.length; i++) {
-            var d = e.hityaku[i];
-            // var matrix = d.matrix;
+        let nexter = true;
+        let changeBonusFlag = false;
+        for (let i = 0; i < e.hityaku.length; i++) {
+            let d = e.hityaku[i];
+            // let matrix = d.matrix;
             console.log(d);
             switch (gameMode) {
                 case 'normal':
@@ -49,10 +48,10 @@ function main() {
                             renCount++;
                             bonusFlag = null;
                             setGamemode('SBIG');
-                            var t = 4000 / (310 - lastBonusCount);
+                            let t = 4000 / (310 - lastBonusCount);
                             if (renCount == 1) lastBonusCount = 0;
-                            var countUpFn;
-                            var count = lastBonusCount;
+                            let countUpFn;
+                            let count = lastBonusCount;
                             setTimeout(countUpFn = () => {
                                 segments.effectseg.setSegments('' + count);
                                 count++;
@@ -64,7 +63,7 @@ function main() {
                             } else {
                                 await sounder.playSound('fan2');
                             }
-                            sounder.playSound("big1", true, () => { }, 14.276);
+                            sounder.playSound("big1", true, () => {}, 14.276);
                             bonusData = new BonusData.BigBonus5("SBIG", 310);
                             isEffected = false;
                             $('#disk').removeClass('show');
@@ -80,6 +79,7 @@ function main() {
                             $('#disk').removeClass('show');
                             voltageReset();
                             playcount = 0;
+                            bonusKokutid = true;
                             break
                         case 'REG': //CZに移行
                             setGamemode('REG');
@@ -107,28 +107,33 @@ function main() {
                             bonusData.jacIn('REG', 8, 8);
                             bonusFlag = null;
                             playcount = 0;
+                            bonusKokutid = true;
                             break
                         case 'JAC1':
                             setGamemode('JAC1');
                             bonusData.jacIn('JAC1', 8, 8);
                             bonusFlag = null;
+                            bonusKokutid = true;
                             break
                         case "JAC2":
                             setGamemode('JAC2');
                             bonusData.jacIn('JAC2', 3, 3);
                             bonusFlag = null;
                             playcount = 0;
+                            bonusKokutid = true;
                             break
                         case 'JAC3':
                             setGamemode('JAC3');
                             bonusData.jacIn('JAC3', 8, 8);
                             bonusFlag = null;
                             playcount = 0;
+                            bonusKokutid = true;
                             break
                         case 'JAC4':
                             setGamemode('JAC4');
                             bonusData.jacIn('JAC4', 8, 8);
                             bonusFlag = null;
+                            bonusKokutid = true;
                     }
                     break
                 case 'REG':
@@ -150,11 +155,11 @@ function main() {
         bonusData = null;
         bonusFlag = null;
     });
-    slotmodule.on("payend", function (e) {
+    slotmodule.on("payend", function(e) {
         // console.log(e)
         if (gameMode != "normal") {
             bonusData.onNextGame(e.pay)
-            // console.log(bonusData,e.pay,bonusData.getGameMode())
+                // console.log(bonusData,e.pay,bonusData.getGameMode())
             setGamemode(bonusData.getGameMode());
             if (bonusData.isEnd == true) {
                 sounder.stopSound("bgm");
@@ -163,19 +168,19 @@ function main() {
         }
         changeBonusSeg();
     })
-    slotmodule.on("leveron", function () { })
-    slotmodule.on("bet", function (e) {
+    slotmodule.on("leveron", function() {})
+    slotmodule.on("bet", function(e) {
         changeBonusSeg();
         sounder.playSound("3bet")
         if ("coin" in e) {
-            (function (e) {
-                var thisf = arguments.callee;
+            (function(e) {
+                let thisf = arguments.callee;
                 if (e.coin > 0) {
                     coin--;
                     e.coin--;
                     incoin++;
                     changeCredit(-1);
-                    setTimeout(function () {
+                    setTimeout(function() {
                         thisf(e)
                     }, 70)
                 } else {
@@ -188,10 +193,10 @@ function main() {
             changeBonusSeg();
         }
     })
-    slotmodule.on("pay", async (e) => {
-        var pays = e.hityaku.pay;
-        var loopPaySound = null;
-        var payCount = 0;
+    slotmodule.on("pay", async(e) => {
+        let pays = e.hityaku.pay;
+        let loopPaySound = null;
+        let payCount = 0;
         if (pays >= 2 && !notplaypaysound) sounder.playSound(loopPaySound = 'pay', true);
         if (replayFlag) {
             if (!notplaypaysound) {
@@ -224,15 +229,16 @@ function main() {
             }
         }
     })
-    var jacFlag = false;
-    slotmodule.on("lot", function (e) {
-        var ret = -1;
-        var lotter = new Lotter(lotdata[gameMode]);
-        var lot = window.power || lotter.lot().name;
+    let jacFlag = false;
+    let firstHit = false;
+    slotmodule.on("lot", function(e) {
+        let ret = -1;
+        let lotter = new Lotter(lotdata[gameMode]);
+        let lot = window.power || lotter.lot().name;
         window.power = null;
         switch (gameMode) {
             case "normal":
-                if (slotmodule.playControlData.betcoin == 1) {
+                if (slotmodule.playControlData.betcoin != 3) {
                     ret = '1枚がけSBIG';
                     break;
                 }
@@ -255,6 +261,7 @@ function main() {
                             break
                         }
                         ret = bonusFlag = "SBIG"
+                        firstHit = true;
                         switch (rand(8)) {
                             case 7:
                             case 6:
@@ -279,6 +286,7 @@ function main() {
                             ret = bonusFlag;
                             break
                         }
+                        firstHit = true;
                         ret = bonusFlag = "NBIG"
                         switch (rand(8)) {
                             case 7:
@@ -321,7 +329,7 @@ function main() {
                         }
                         break;
                     default:
-                        ret = "JAC1"
+                        ret = "通常はずれ"
                         if (bonusFlag) {
                             ret = bonusFlag;
                         }
@@ -353,6 +361,7 @@ function main() {
                             ret = bonusFlag;
                             break
                         }
+                        bonusKokutid = false;
                         bonusFlag = 'JAC2';
                         switch (rand(6)) {
                             case 0:
@@ -373,6 +382,7 @@ function main() {
                             ret = bonusFlag;
                             break
                         }
+                        bonusKokutid = false;
                         bonusFlag = 'JAC3';
                         switch (rand(6)) {
                             case 0:
@@ -460,24 +470,28 @@ function main() {
                                 ret = "確定チェリー"
                                 break
                         }
+                        bonusKokutid = false;
                         break
                     case 'JAC1':
                         bonusFlag = 'JAC1';
-                        if(!rand(4)){
+                        if (!rand(4)) {
                             ret = 'スイカ'
-                        }else{
+                        } else {
                             ret = 'ベル'
                         }
                         break
                     case 'JAC4':
                         bonusFlag = 'JAC4';
                         ret = 'JAC4'
-                        if(!rand(8)) ret = 'スイカ'
+                        if (!rand(8)) ret = 'スイカ'
                         break
                     default:
-                        ret = bonusFlag
+                        ret = bonusFlag;
+                        if (/JAC[23]/.test(ret)) {
+                            ret = 'ボーナスゲーム' + ret;
+                        }
                 }
-                console.log({lot,bonusFlag,ret});
+                console.log({ lot, bonusFlag, ret });
                 break
             case 'SBIG':
                 ret = 'JACGAME1'
@@ -485,37 +499,37 @@ function main() {
             case 'REG':
                 ret = lot;
         }
-        effect(ret);
+        effect(ret, lot);
         console.log(ret)
         return ret;
     })
-    slotmodule.on("reelstop", function () {
+    slotmodule.on("reelstop", function() {
         sounder.playSound("stop")
     })
-    $("#saveimg").click(function () {
+    $("#saveimg").click(function() {
         SaveDataToImage();
     })
-    $("#cleardata").click(function () {
+    $("#cleardata").click(function() {
         if (confirm("データをリセットします。よろしいですか？")) {
             ClearData();
         }
     })
-    $("#loadimg").click(function () {
+    $("#loadimg").click(function() {
         $("#dummyfiler").click();
     })
-    $("#dummyfiler").change(function (e) {
-        var file = this.files[0];
-        var image = new Image();
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            image.onload = function () {
-                var canvas = $("<canvas></canvas>")
+    $("#dummyfiler").change(function(e) {
+        let file = this.files[0];
+        let image = new Image();
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            image.onload = function() {
+                let canvas = $("<canvas></canvas>")
                 canvas[0].width = image.width;
                 canvas[0].height = image.height;
-                var ctx = canvas[0].getContext('2d');
+                let ctx = canvas[0].getContext('2d');
                 ctx.drawImage(image, 0, 0)
-                var imageData = ctx.getImageData(0, 0, canvas[0].width, canvas[0].height)
-                var loadeddata = SlotCodeOutputer.load(imageData.data);
+                let imageData = ctx.getImageData(0, 0, canvas[0].width, canvas[0].height)
+                let loadeddata = SlotCodeOutputer.load(imageData.data);
                 if (loadeddata) {
                     parseSaveData(loadeddata)
                     alert("読み込みに成功しました")
@@ -525,14 +539,14 @@ function main() {
             }
             image.src = evt.target.result;
         }
-        reader.onerror = function (e) {
+        reader.onerror = function(e) {
             alert("error " + e.target.error.code + " \n\niPhone iOS8 Permissions Error.");
         }
         reader.readAsDataURL(file)
     })
-    slotmodule.on("reelstart", function () {
+    slotmodule.on("reelstart", function() {
         if (okure) {
-            setTimeout(function () {
+            setTimeout(function() {
                 sounder.playSound("start")
             }, 100)
         } else {
@@ -540,8 +554,8 @@ function main() {
         }
         okure = false;
     })
-    var okure = false;
-    var sounder = new Sounder();
+    let okure = false;
+    window.sounder = new Sounder();
     sounder.addFile("sound/stop.wav", "stop").addTag("se");
     sounder.addFile("sound/start.wav", "start").addTag("se").setVolume(0.5);
     sounder.addFile("sound/bet.wav", "3bet").addTag("se").setVolume(0.5);
@@ -572,7 +586,7 @@ function main() {
     sounder.addFile("sound/fan2.mp3", "fan2").addTag("se").setVolume(0.5);
     sounder.addFile("sound/chancezone.mp3", "chancezone").addTag("bgm").setVolume(0.2);
     sounder.addFile("sound/chancezoneend.mp3", "chancezoneend").addTag("se")
-    sounder.addFile("sound/voltageup.mp3", "voltageup").addTag("se")
+    sounder.addFile("sound/voltageup.mp3", "voltageup").addTag("se").setVolume(0.1)
     sounder.addFile("sound/leverstart.mp3", "leverstart").addTag("se")
     sounder.addFile("sound/leverpush.mp3", "leverpush").addTag("se")
     sounder.addFile("sound/win.mp3", "win").addTag("se")
@@ -580,37 +594,34 @@ function main() {
     sounder.addFile("sound/geki.mp3", "geki").addTag("se")
     sounder.addFile("sound/title.mp3", "title").addTag("se")
     sounder.addFile("sound/type.mp3", "type").addTag("se")
-    // sounder.setVolume("se", 0.2)
-    // sounder.setVolume("bgm", 0.2)
-    sounder.loadFile(function () {
-        window.sounder = sounder
-        console.log(sounder)
-    })
-    var normalLotter = new Lotter(lotdata.normal);
-    var bigLotter = new Lotter(lotdata.big);
-    var jacLotter = new Lotter(lotdata.jac);
+
+    sounder.setMasterVolume(0.5)
+
+    let normalLotter = new Lotter(lotdata.normal);
+    let bigLotter = new Lotter(lotdata.big);
+    let jacLotter = new Lotter(lotdata.jac);
     window.gameMode = "NBIG";
-    var bonusFlag = 'JAC1'
-    var coin = 0;
-    window.bonusData = new BonusData.BigBonus5("NBIG", rand(NBIG_PAY)+1);
-    var replayFlag;
-    var isCT = false;
-    var CTBIG = false;
-    var isSBIG;
-    var ctdata = {};
-    var regstart;
-    var afterNotice;
-    var bonusSelectIndex;
-    var ctNoticed;
-    var playcount = 0;
-    var allplaycount = 0;
-    var incoin = 0;
-    var outcoin = 0;
-    var bonuscounter = {
+    let bonusFlag = 'JAC1'
+    let coin = 0;
+    window.bonusData = new BonusData.BigBonus5("NBIG", rand(NBIG_PAY) + 1);
+    let replayFlag;
+    let isCT = false;
+    let CTBIG = false;
+    let isSBIG;
+    let ctdata = {};
+    let regstart;
+    let afterNotice;
+    let bonusSelectIndex;
+    let ctNoticed;
+    let playcount = 0;
+    let allplaycount = 0;
+    let incoin = 0;
+    let outcoin = 0;
+    let bonuscounter = {
         count: {},
         history: []
     };
-    slotmodule.on("leveron", function () {
+    slotmodule.on("leveron", function() {
         if (gameMode != "BIG1") {
             playcount++;
             allplaycount++;
@@ -650,18 +661,18 @@ function main() {
         allplaycount = data.allplaycount
         changeCredit(0)
     }
-    window.SaveDataToImage = function () {
+    window.SaveDataToImage = function() {
         SlotCodeOutputer.save(stringifySaveData())
     }
-    window.SaveData = function () {
-        var savedata = stringifySaveData()
+    window.SaveData = function() {
+        let savedata = stringifySaveData()
         localStorage.setItem("savedata", JSON.stringify(savedata))
         return true;
     }
-    window.LoadData = function () {
-        var savedata = localStorage.getItem("savedata")
+    window.LoadData = function() {
+        let savedata = localStorage.getItem("savedata")
         try {
-            var data = JSON.parse(savedata)
+            let data = JSON.parse(savedata)
             parseSaveData(data)
             changeCredit(0)
         } catch (e) {
@@ -669,7 +680,7 @@ function main() {
         }
         return true;
     }
-    window.ClearData = function () {
+    window.ClearData = function() {
         coin = 0;
         bonuscounter = {
             count: {},
@@ -683,7 +694,7 @@ function main() {
         changeCredit(0)
     }
 
-    var oldGameMode = null;
+    let oldGameMode = null;
 
     function setGamemode(mode) {
         oldGameMode = gameMode;
@@ -691,7 +702,7 @@ function main() {
         switch (mode) {
             case 'normal':
                 gameMode = 'normal';
-                if(bonusFlag && bonusFlag.includes('JAC')) bonusFlag = null;
+                if (bonusFlag && bonusFlag.includes('JAC')) bonusFlag = null;
                 slotmodule.setLotMode(0)
                 slotmodule.setMaxbet(3);
                 break
@@ -731,12 +742,12 @@ function main() {
                 slotmodule.setMaxbet(1);
         }
     }
-    var segments = {
+    let segments = {
         creditseg: segInit("#creditSegment", 2),
         payseg: segInit("#paySegment", 2),
         effectseg: segInit("#effectSegment", 4)
     }
-    var credit = 50;
+    let credit = 50;
     segments.creditseg.setSegments(50);
     segments.creditseg.setOffColor(80, 30, 30);
     segments.payseg.setOffColor(80, 30, 30);
@@ -744,7 +755,7 @@ function main() {
     segments.creditseg.reset();
     segments.payseg.reset();
     segments.effectseg.reset();
-    var lotgame;
+    let lotgame;
 
     function changeCredit(delta) {
         credit += delta;
@@ -759,26 +770,27 @@ function main() {
     }
 
     function changeBonusSeg() {
-        if (!this.bonusData||gameMode == 'NBIG'||gameMode.includes('JAC')){
+        if (!this.bonusData || gameMode == 'NBIG' || gameMode.includes('JAC')) {
             segments.effectseg.setSegments("");
-        }else{
+        } else {
             segments.effectseg.setSegments(bonusData.getBonusSeg());
         }
         // if (this.bonusData instanceof BonusData.RegularBonus5) return;
         if (gameMode.includes('JAC')) {
-            if(gameMode == 'JAC1' && bonusData.payCount > 3){
+            if (gameMode == 'JAC1' && bonusData.payCount > 3) {
                 return;
             }
-            segments.payseg.setSegments("" + bonusData.payCount)
+            let val = Math.min(bonusData.payCount, bonusData.gameCount);
+            segments.payseg.setSegments("" + val)
         }
     }
     const VoltageMap = {
         CZ: {
             low: [
-                [50, 49, 1, 0, 0,],
-                [0, 50, 49, 1, 0,],
-                [0, 0, 60, 40, 0,],
-                [0, 0, 0, 99, 1,],
+                [50, 49, 1, 0, 0, ],
+                [0, 50, 49, 1, 0, ],
+                [0, 0, 60, 40, 0, ],
+                [0, 0, 0, 99, 1, ],
                 [0, 0, 0, 0, 100],
             ],
             high: [
@@ -790,20 +802,23 @@ function main() {
             ],
         },
         normal: {
-            'はずれ': [979, 20, 1, 0, 0],
+            'JAC1': [995, 5, 0, 0, 0],
+            'はずれ': [50, 40, 9, 0, 1],
             'リプレイ': [68, 30, 2, 0, 0],
-            'ベル': [20, 0, 70, 10, 0],
-            'チェリー': [20, 0, 70, 10, 0],
-            'チャンス目1': [10, 5, 1, 70, 14],
-            'チャンス目2': [5, 5, 1, 60, 29],
-            'JACIN2': [15, 1, 60, 20, 4],
-            'REG1': [15, 1, 30, 40, 14],
-            'REG2': [15, 1, 0, 30, 54]
+            'ベル': [20, 40, 30, 8, 2],
+            'チェリー': [20, 0, 20, 50, 10],
+            'スイカ': [20, 0, 20, 50, 10],
+            'JAC2': [5, 5, 40, 30, 20],
+            'JAC3': [15, 5, 10, 30, 40],
+            'NBIG': [15, 5, 10, 30, 40],
+            'SBIG': [15, 5, 5, 5, 70],
+            'REG': [5, 25, 35, 35, 0]
         }
     }
+
     function ArrayLot(list) {
-        var sum = list.reduce((a, b) => a + b);
-        var r = rand(sum);
+        let sum = list.reduce((a, b) => a + b);
+        let r = rand(sum);
         return list.findIndex(n => {
             return (r -= n) < 0;
         })
@@ -814,7 +829,12 @@ function main() {
     async function upVoltage(from, to) {
 
         while (from < to) {
-            voltageElements[from].addClass('show');
+            let el = voltageElements[from]
+            if (!el) {
+                from++;
+                continue;
+            }
+            el.addClass('show');
             await sounder.playSound('voltageup')
             from++;
         }
@@ -827,7 +847,7 @@ function main() {
     async function bonusKokuti(isGet) {
         if (isEffected) return;
         isEffected = true;
-        var typewritter = false;
+        let typewritter = false;
         $('#renda').removeClass('show');
         $('#geki').removeClass('show');
         $('#itigeki').removeClass('show');
@@ -864,8 +884,8 @@ function main() {
 
     async function leverChance(isGet) {
         const typeTable = { true: [20, 80], false: [80, 20] }[isGet];
-        var downEvent;
-        var fn;
+        let downEvent;
+        let fn;
         const gekiFlag = !!ArrayLot({ true: [95, 5], false: [99, 1] }[isGet]);
         window.addEventListener('keydown', downEvent = (e) => {
             if (fn) {
@@ -882,8 +902,8 @@ function main() {
         await sounder.playSound('leverstart');
         if (ArrayLot(typeTable) == 0) {
             $('#renda').addClass('show');
-            var pushCount = isGet ? 1 + rand(15) : -1;
-            fn = async () => {
+            let pushCount = isGet ? 1 + rand(15) : -1;
+            fn = async() => {
                 pushCount--;
                 sounder.playSound('leverpush');
                 if (!$disk.hasClass('show')) {
@@ -898,7 +918,7 @@ function main() {
                 await bonusKokuti(isGet);
             }
             if (!isEffected) {
-                setTimeout(async () => {
+                setTimeout(async() => {
                     window.removeEventListener('keydown', downEvent);
                     $('canvas')[0].removeEventListener('touchstart', downEvent);
                     await bonusKokuti(isGet);
@@ -906,7 +926,7 @@ function main() {
             }
         } else {
             $('#itigeki').addClass('show');
-            fn = async () => {
+            fn = async() => {
                 sounder.playSound('leverpush')
                 window.removeEventListener('keydown', downEvent);
                 $('canvas')[0].removeEventListener('touchstart', downEvent);
@@ -916,97 +936,203 @@ function main() {
     }
 
 
-    async function TypeWra(text,timing = 0){
-        return new Promise(r=>{
-            var f = (cb)=>{
+    async function TypeWra(text, timing = 0) {
+        return new Promise(r => {
+            let f = (cb) => {
                 slotmodule.freeze();
-                Typewriter(text,{
-                    speed:150,
-                    delay:5000,
-                }).change((t)=>{
-                    t!="\n"&&sounder.playSound('type');
-                }).title(()=>{
+                Typewriter(text, {
+                    speed: 150,
+                    delay: 5000,
+                }).change((t) => {
+                    t != "\n" && sounder.playSound('type');
+                }).title(() => {
                     sounder.playSound('title');
-                }).finish((e)=>{
+                }).finish((e) => {
                     e.parentNode.removeChild(e);
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         slotmodule.resume();
                         r();
-                    },1000)
+                    }, 1000)
                 });
             }
-            if(timing == 0) return f();
-            var f2 = ()=>{
-                slotmodule.once('reelstop',()=>{
+            if (timing == 0) return f();
+            let f2 = () => {
+                slotmodule.once('reelstop', async() => {
                     timing--;
-                    if(timing == 0) return f();
+                    if (timing == 0) {
+                        slotmodule.freeze();
+                        await sleep(2000);
+                        return f();
+                    }
                     f2();
                 })
             }
             f2();
         })
-        
-        
+
+
     }
 
-    var voltageIndex;
-    var isEffected = false;
-    var isGekiLamp;
-    async function effect(lot) {
+    const TypeWriterTable = {
+        'はずれ': [{
+            name: 'リーチ目を盗め！',
+            value: 1 / 256
+        }],
+        'ベル': [{
+            name: 'プラムを盗め！',
+            value: 1 / 128
+        }],
+        'スイカ': [{
+            name: 'スイカを盗め！',
+            value: 1 / 8
+        }],
+        'チェリー': [{
+            name: 'チェリーを盗め！',
+            value: 1 / 128
+        }],
+        '確定チェリー': [{
+            name: 'チェリーを盗め！',
+            value: 1 / 16
+        }],
+        'JAC3': [{
+            name: 'リーチ目を盗め！',
+            value: 1 / 32,
+        }, {
+            name: 'プラムを盗め！',
+            value: 1 / 24
+        }, {
+            name: 'スイカを盗め！',
+            value: 1 / 16
+        }, {
+            name: 'チェリーを盗め！',
+            value: 1 / 16
+        }, {
+            name: '俺の名は<br>イケゾリ三世',
+            value: 1 / 32
+        }]
+    }
+    TypeWriterTable.NBIG = TypeWriterTable.JAC3;
+    TypeWriterTable.SBIG = Object.assign(TypeWriterTable.JAC3, {});
+    TypeWriterTable.SBIG.push({
+        name: 'スーパービッグボーナス<br>確定！',
+        value: 1 / 32
+    })
+
+    let voltageIndex;
+    let isEffected = false;
+    let isGekiLamp;
+    let bonusKokutid = true;
+    async function effect(control, lot) {
         switch (gameMode) {
-            case 'normal':
-            break
             case 'NBIG':
-                if(oldGameMode != 'JAC4'){
-                    if(lot == 'JAC4'){
-                        if(rand(8)){
-                            let type = !rand(4) == 0 ? 'スイカを盗め！' : 'プラムを盗め！';
-                            await TypeWra(type,!rand(6) ? 1 : 0);
-                            if(!rand(8)){
-                                await TypeWra('俺の名は<br>イケゾリ三世')
-                            }
+                voltageIndex = 0;
+                console.log({ oldGameMode })
+                if (oldGameMode != 'JAC4' && oldGameMode != 'NBIG') {
+                    if (bonusFlag === 'JAC2' || bonusFlag === 'JAC3') {
+
+                        console.log(bonusKokutid);
+                        if (bonusKokutid == false) {
+                            slotmodule.freeze();
+                            slotmodule.setFlash(flashdata.BlueFlash);
+                            await sounder.playSound('win');
+                            slotmodule.resume();
+                            slotmodule.clearFlashReservation();
+                            bonusKokutid = true;
                         }
-                    }else{
-                        if(lot == 'スイカ'){
-                            if(rand(4)){
-                                TypeWra('スイカを盗め！',!rand(32) ? 1 : 0)
+                    } else {
+                        if (control == 'JAC4') {
+                            if (rand(8)) {
+                                let type = !rand(4) == 0 ? 'スイカを盗め！' : 'プラムを盗め！';
+                                await TypeWra(type, !rand(6) ? 1 : 0);
+                                if (!rand(8)) {
+                                    await TypeWra('俺の名は<br>イケゾリ三世')
+                                }
                             }
-                        }
-                        if(lot == 'ベル'){
-                            if(rand(4)){
-                                TypeWra('プラムを盗め！',!rand(32) ? 1 : 0)
+                        } else {
+                            if (control == 'スイカ') {
+                                if (rand(4)) {
+                                    TypeWra('スイカを盗め！', !rand(32) ? 1 : 0)
+                                }
                             }
+                            if (control == 'ベル') {
+                                if (rand(4)) {
+                                    TypeWra('プラムを盗め！', !rand(32) ? 1 : 0)
+                                }
+                            }
+
                         }
                     }
-                }else{
 
                 }
-            break
+                break
             case 'SBIG':
-            break
+                break
             case 'JAC1':
-            break
+            case 'normal':
+                $('.colorBar').removeClass('show');
+                voltageIndex = 0;
+                if (bonusFlag == null && gameMode === 'JAC1' && bonusData.gameCount <= 4) {
+                    slotmodule.once('payend', async() => {
+                        if (gameMode !== 'JAC1' && gameMode !== 'NBIG') return;
+                        slotmodule.freeze();
+                        let v = 4 - bonusData.gameCount;
+                        await upVoltage(voltageIndex, voltageIndex = v);
+                        slotmodule.resume();
+                    })
+                }
+                let effectLot = bonusFlag || lot || 'はずれ';
+                if (TypeWriterTable[effectLot]) {
+                    if (bonusFlag === null || firstHit) {
+                        let TypeWraLotter = new Lotter(TypeWriterTable[effectLot]);
+                        let r = TypeWraLotter.lot();
+                        if (r.name !== null) {
+                            let timing = (bonusFlag !== null ? !rand(4) : !rand(32));
+                            firstHit = false
+                            bonusKokutid = true;
+                            return await TypeWra(r.name, timing ? 1 : 0)
+                        }
+                    }
+                }
+
+
+                let arr = VoltageMap.normal[effectLot];
+                let idx = ArrayLot(arr);
+                let effected = false;
+
+
+                if (bonusFlag !== null && bonusFlag !== 'JAC1') {
+                    if (idx > 0 && !rand(8)) {
+                        await slotmodule.once('stop');
+                        effected = true;
+                        upVoltage(voltageIndex, voltageIndex = idx);
+                    }
+                }
+                if (!effected) {
+                    upVoltage(voltageIndex, voltageIndex = idx);
+                }
+                firstHit = false;
+                break
             case 'JAC2':
-            break
+                break
             case 'JAC3':
-            break
+                break
             case 'JAC4':
         }
     }
-    $(window).bind("unload", function () {
+    $(window).bind("unload", function() {
         SaveData();
     });
     LoadData();
 }
 
 function and() {
-    return Array.prototype.slice.call(arguments).every(function (f) {
+    return Array.prototype.slice.call(arguments).every(function(f) {
         return f
     })
 }
 
 function or() {
-    return Array.prototype.slice.call(arguments).some(function (f) {
+    return Array.prototype.slice.call(arguments).some(function(f) {
         return f
     })
 }
@@ -1016,9 +1142,9 @@ function rand(m, n = 0) {
 }
 
 function replaceMatrix(base, matrix, front, back) {
-    var out = JSON.parse(JSON.stringify(base));
-    matrix.forEach(function (m, i) {
-        m.forEach(function (g, j) {
+    let out = JSON.parse(JSON.stringify(base));
+    matrix.forEach(function(m, i) {
+        m.forEach(function(g, j) {
             if (g == 1) {
                 front && (out.front[i][j] = front);
                 back && (out.back[i][j] = back);
@@ -1029,17 +1155,17 @@ function replaceMatrix(base, matrix, front, back) {
 }
 
 function flipMatrix(base) {
-    var out = JSON.parse(JSON.stringify(base));
-    return out.map(function (m) {
-        return m.map(function (p) {
+    let out = JSON.parse(JSON.stringify(base));
+    return out.map(function(m) {
+        return m.map(function(p) {
             return 1 - p;
         })
     })
 }
 
 function segInit(selector, size) {
-    var cangvas = $(selector)[0];
-    var sc = new SegmentControler(cangvas, size, 0, -3, 50, 30);
+    let cangvas = $(selector)[0];
+    let sc = new SegmentControler(cangvas, size, 0, -3, 50, 30);
     sc.setOffColor(120, 120, 120)
     sc.setOnColor(230, 0, 0)
     sc.reset();
@@ -1049,5 +1175,11 @@ function segInit(selector, size) {
 function delay(ms) {
     return new Promise(r => {
         setTimeout(r, ms);
+    })
+}
+
+async function sleep(t) {
+    return new Promise(r => {
+        setTimeout(r, t);
     })
 }
